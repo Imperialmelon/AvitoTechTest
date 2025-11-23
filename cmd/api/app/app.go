@@ -13,7 +13,9 @@ import (
 	"github.com/Imperialmelon/AvitoTechTest/internal/app/repository"
 	"github.com/Imperialmelon/AvitoTechTest/internal/app/service"
 	"github.com/Imperialmelon/AvitoTechTest/internal/app/usecase"
+	"github.com/Imperialmelon/AvitoTechTest/internal/middleware"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -36,6 +38,8 @@ func Run() error {
 	handler := handlers.NewHandler(usecaseInstance)
 
 	r := mux.NewRouter()
+	r.Use(middleware.MetricsMiddleware)
+
 	handler.Register(r)
 
 	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
@@ -53,6 +57,10 @@ func Run() error {
 		if err != nil && err != http.ErrServerClosed {
 			log.Fatal("Server failed to start", "error", err)
 		}
+	}()
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		http.ListenAndServe(":10000", nil)
 	}()
 
 	quit := make(chan os.Signal, 1)

@@ -12,7 +12,7 @@ import (
 )
 
 type Handler struct {
-	prUC PRUseCase ``
+	prUC PRUseCase
 }
 
 func NewHandler(prUC PRUseCase) *Handler {
