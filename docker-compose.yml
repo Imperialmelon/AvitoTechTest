@@ -22,6 +22,33 @@ services:
       timeout: 5s
       retries: 5
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: avito-prometheus
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - avito-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: avito-grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - avito-network
+    volumes:
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
+
 
   app:
     build:
@@ -47,6 +74,7 @@ services:
     restart: unless-stopped
 
 volumes:
+  grafana_data:
   postgres_data:
 
 networks:
