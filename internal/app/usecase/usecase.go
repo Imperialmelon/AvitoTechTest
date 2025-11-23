@@ -7,7 +7,6 @@ import (
 	"github.com/Imperialmelon/AvitoTechTest/internal/app/usecase/user"
 )
 
-// Repository алиас для service.Repository
 type Repository = service.Repository
 
 type UseCase struct {
